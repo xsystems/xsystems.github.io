@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <title>xsystems-weather demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../xsystems-weather.html">
+    <link rel="import" href="../xsystems-weather-service-wunderground.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  <body>
+
+    <div class="vertical-section-container centered">
+      <h3>Basic xsystems-weather Demo</h3>
+      <demo-snippet>
+        <template is="dom-bind">
+          <xsystems-weather-service-wunderground  key="d543a18b79ebf11a"
+                                                  query="Netherlands/The_Hague"
+                                                  data="{{forecast}}"></xsystems-weather-service-wunderground>
+          <xsystems-weather data="[[forecast]]"></xsystems-weather>
+        </template>
+      </demo-snippet>
+    </div>
+
+  </body>
+</html>

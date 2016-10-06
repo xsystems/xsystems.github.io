@@ -1,0 +1,155 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<!--
+`xsystems-flickr-photo`
+Element to obtain photo data from the Flickr API.
+
+@demo demo/index.html
+-->
+
+<dom-module id="xsystems-flickr-photo">
+  <template>
+    <iron-ajax  id="photoInfoAjax"
+                url="https://api.flickr.com/services/rest/"
+                debounce-duration="[[debounceDuration]]"
+                last-response="{{_responseInfo}}">
+    </iron-ajax>
+
+    <iron-ajax  id="photoSizesAjax"
+                url="https://api.flickr.com/services/rest/"
+                debounce-duration="[[debounceDuration]]"
+                last-response="{{_responseSizes}}">
+    </iron-ajax>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'xsystems-flickr-photo',
+
+        properties: {
+          /**
+           * Flickr API key.
+           */
+          key: String,
+
+          /**
+           * Id of the photo for which to get data.
+           */
+          photoId: String,
+
+          /**
+           * The secret for the photo.
+           *
+           * If the correct secret is passed then permissions checking is skipped.
+           * This enables the 'sharing' of individual photos by passing around the id and secret.
+           */
+          secret: String,
+
+          /**
+           * The prefered photo size.
+
+           * See the <a href="https://www.flickr.com/services/api/flickr.photos.getSizes.html">Flickr API documentation</a> for the available sizes.
+           */
+          size: {
+            type: String,
+            value: 'Original'
+          },
+
+          /**
+           * Length of time in milliseconds to debounce multiple automatically generated requests.
+           */
+          debounceDuration: Number,
+
+          /**
+           * Photo title.
+           */
+          title: {
+            type: String,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Photo description.
+           */
+          description: {
+            type: String,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Photo URL.
+           */
+          url: {
+            type: String,
+            readOnly: true,
+            notify: true
+          },
+          _responseInfo: Object,
+          _responseSizes: Object
+        },
+
+        observers: [
+          '_computeRequestParams(key, photoId, size)',
+          '_processResponseInfo(_responseInfo)',
+          '_processResponseSizes(_responseSizes)'
+        ],
+
+        _computeRequestParams: function(key, photoId, size) {
+          var requestParamsInfo = {};
+          requestParamsInfo.format = 'json';
+          requestParamsInfo.nojsoncallback = 1;
+          requestParamsInfo.method = 'flickr.photos.getInfo';
+          requestParamsInfo.api_key = key;
+          requestParamsInfo.photo_id = photoId;
+
+          if (this.secret != null) {
+            requestParamsInfo.secret = this.secret;
+          }
+
+          this.$.photoInfoAjax.params = requestParamsInfo;
+          this.$.photoInfoAjax.generateRequest();
+
+          var requestParamsSizes = {};
+          requestParamsSizes.format = 'json';
+          requestParamsSizes.nojsoncallback = 1;
+          requestParamsSizes.method = 'flickr.photos.getSizes';
+          requestParamsSizes.api_key = key;
+          requestParamsSizes.photo_id = photoId;
+
+          this.$.photoSizesAjax.params = requestParamsSizes;
+          this.$.photoSizesAjax.generateRequest();
+        },
+
+        _processResponseInfo: function(responseInfo) {
+          if (responseInfo.stat != "ok") {
+            return;
+          }
+
+          var photoInfo = responseInfo.photo;
+
+          this._setTitle(photoInfo.title._content);
+          this._setDescription(photoInfo.description._content);
+        },
+
+        _processResponseSizes: function(responseSizes) {
+          if (responseSizes.stat != "ok") {
+            return;
+          }
+
+          var photoSizes = responseSizes.sizes.size;
+
+          for (var i = 0; i < photoSizes.length; i++) {
+            var photoSize = photoSizes[i];
+            if (photoSize.label == this.size) {
+              this._setUrl(photoSize.source);
+            }
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

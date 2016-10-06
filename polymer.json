@@ -1,0 +1,14 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/xsystems-elements-app/xsystems-elements-app.html",
+  "fragments": [
+
+  ],
+  "sources": [
+    "src/**/*",
+    "bower.json"
+  ],
+  "includeDependencies": [
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js"
+  ]
+}

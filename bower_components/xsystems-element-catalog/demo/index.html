@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+  <head>
+    <title>xsystems-element-catalog demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../polymer/polymer.html">
+
+    <link rel="import" href="../../app-layout/app-header/app-header.html">
+    <link rel="import" href="../../app-layout/app-header-layout/app-header-layout.html">
+    <link rel="import" href="../../app-layout/app-toolbar/app-toolbar.html">
+    <link rel="import" href="../../app-layout/app-scroll-effects/effects/waterfall.html">
+    <link rel="import" href="../../iron-icons/iron-icons.html">
+    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../marked-element/marked-element.html">
+    <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="../../paper-material/paper-material.html">
+    <link rel="import" href="../../paper-styles/color.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../prism-element/prism-highlighter.html">
+    <link rel="import" href="../../prism-element/prism-theme-default.html">
+
+    <link rel="import" href="../xsystems-element-catalog.html">
+  </head>
+  <body>
+    <dom-module id="xsystems-element-catalog-demo">
+      <template>
+        <style>
+          :host {
+            @apply(--layout-vertical);
+            padding-left: 20%;
+            padding-right: 20%;
+            font-family: 'Roboto', 'Noto', sans-serif;
+            font-size: 14px;
+          }
+
+          paper-material {
+            @apply(--layout-vertical);
+            background-color: white;
+            margin-bottom: 1%;
+          }
+
+          marked-element {
+            @apply(--layout-vertical);
+          }
+
+          .markdown-html {
+            padding-left: 5%;
+            background-color: var(--google-grey-100);
+            overflow: auto;
+          }
+
+          app-header-layout {
+            height: 400px;
+          }
+
+          app-header {
+            background-color: black;
+            color: white;
+          }
+
+          div[main-title] {
+            @apply(--paper-font-headline);
+            position: absolute;;
+            left: 15%;
+          }
+
+          xsystems-element-catalog {
+            height: 100%;
+          }
+        </style>
+
+        <prism-highlighter></prism-highlighter>
+
+        <h3>Basic xsystems-element-catalog Demo</h3>
+        <paper-material elevation="1">
+          <div class="demo">
+            <app-header-layout has-scrolling-region>
+              <app-header fixed effects="waterfall">
+                <app-toolbar>
+                  <paper-icon-button  icon="arrow-back"
+                                      on-tap="_deselectElement"
+                                      hidden$="[[!element]]">
+                  </paper-icon-button>
+                  <div main-title>[[_calculateTitle(elements, element)]]</div>
+                </app-toolbar>
+              </app-header>
+              <xsystems-element-catalog elements="[[elements]]"
+                                        selected="{{element}}"
+                                        base="[[base]]">
+              </xsystems-element-catalog>
+            </app-header-layout>
+          </div>
+
+          <marked-element markdown="[[demo]]">
+            <div class="markdown-html"></div>
+          </marked-element>
+        </paper-material>
+      </template>
+      <script>
+        HTMLImports.whenReady(function () {
+          Polymer({
+            is: 'xsystems-element-catalog-demo',
+
+            properties: {
+              elements: {
+                type: Array,
+                value: function() {
+                  return ['xsystems-bower', 'app-layout', 'iron-doc-viewer'];
+                }
+              },
+              base: {
+                type: String,
+                value: function() {
+                  if (location.hostname == 'localhost') {
+                    return location.protocol + "//" + location.host + '/bower_components/';
+                  } else {
+                    return location.protocol + "//" + location.host + '/xsystems-element-catalog/components/';
+                  }
+                }
+              },
+              demo: {
+                type: String,
+                value: '```html\n\
+<app-header-layout fullbleed has-scrolling-region>\n\
+  <app-header fixed effects="waterfall">\n\
+    <app-toolbar>\n\
+      <paper-icon-button  icon="arrow-back"\n\
+                          on-tap="_deselectElement"\n\
+                          hidden$="[[!element]]">\n\
+      </paper-icon-button>\n\
+      <div main-title>[[_calculateTitle(elements, element)]]</div>\n\
+    </app-toolbar>\n\
+  </app-header>\n\
+  <xsystems-element-catalog elements="[[elements]]"\n\
+                            selected="{{element}}">\n\
+  </xsystems-element-catalog>\n\
+</app-header-layout>\
+```'
+              }
+            },
+
+            _calculateTitle: function(elements, element) {
+              return elements.indexOf(element) > -1 ? '<' + element + '>' : 'Elements';
+            },
+
+            _deselectElement: function() {
+              this.set('element', null);
+            }
+          });
+        });
+      </script>
+    </dom-module>
+
+    <xsystems-element-catalog-demo></xsystems-element-catalog-demo>
+  </body>
+</html>

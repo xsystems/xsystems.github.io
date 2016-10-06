@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+  <head>
+    <title>xsystems-youtube demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../polymer/polymer.html">
+
+    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../google-youtube/google-youtube.html">
+    <link rel="import" href="../../marked-element/marked-element.html">
+    <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="../../paper-input/paper-input.html">
+    <link rel="import" href="../../paper-material/paper-material.html">
+    <link rel="import" href="../../paper-styles/color.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../prism-element/prism-highlighter.html">
+    <link rel="import" href="../../prism-element/prism-theme-default.html">
+
+    <link rel="import" href="../xsystems-youtube-search.html">
+    <link rel="import" href="../xsystems-youtube-videos.html">
+
+    <link rel="import" href="demo-overlay.html">
+  </head>
+  <body>
+    <dom-module id="xsystems-youtube-demo">
+      <template>
+        <style>
+          :host {
+            @apply(--layout-vertical);
+            padding-left: 20%;
+            padding-right: 20%;
+            font-family: 'Roboto', 'Noto', sans-serif;
+            font-size: 14px;
+          }
+
+          paper-material {
+            @apply(--layout-vertical);
+            background-color: white;
+            margin-bottom: 1%;
+          }
+
+          .demo {
+            padding: 1%;
+          }
+
+          marked-element {
+            @apply(--layout-vertical);
+          }
+
+          .markdown-html {
+            padding-left: 5%;
+            background-color: var(--google-grey-100);
+          }
+
+          xsystems-youtube-videos {
+            width: 100%;
+            height: 800px;
+          }
+
+          #videoPlayerCard {
+            padding: 1%;
+          }
+
+          #videoPlayerCard {
+            width: 854px;
+            height: 480px;
+          }
+
+          #videoPlayer {
+            width: 100%;
+            height: 100%;
+          }
+        </style>
+
+        <prism-highlighter></prism-highlighter>
+
+        <h3>Basic xsystems-youtube Demo</h3>
+        <paper-material elevation="1">
+          <div class="demo">
+            <paper-input  id="queryInput"
+                          label="Which video are you looking for?"
+                          value="{{query}}">
+              <paper-icon-button suffix icon="search"></paper-icon-button>
+            </paper-input>
+
+            <xsystems-youtube-videos  key="AIzaSyDTj9__sWn_MKroJ6vlad1pCCidRBi6a5g"
+                                      query="[[query]]"
+                                      channel="UCnUYZLuoy1rq1aVMwx4aTzw"
+                                      selected="{{video}}">
+            </xsystems-youtube-videos>
+
+            <demo-overlay id="videoOverlay"
+                              on-iron-overlay-closed="_deselectVideo">
+              <paper-card id="videoPlayerCard"
+                          elevation="5">
+                <google-youtube id="videoPlayer"
+                                video-id="[[video.id.videoId]]"
+                                width="100%"
+                                height="100%"
+                                rel="0"
+                                showinfo="0"
+                                iv_load_policy="3"
+                                modestbranding="1">
+                </google-youtube>
+              </paper-card>
+            </demo-overlay>
+          </div>
+
+          <marked-element markdown="[[demo]]">
+            <div class="markdown-html"></div>
+          </marked-element>
+        </paper-material>
+      </template>
+      <script>
+        HTMLImports.whenReady(function () {
+          Polymer({
+            is: 'xsystems-youtube-demo',
+
+            properties: {
+              demo: {
+                type: String,
+                value: '```html\n\
+<paper-input  id="queryInput"\n\
+              label="Which video are you looking for?"\n\
+              value="{{query}}">\n\
+  <paper-icon-button suffix icon="search"></paper-icon-button>\n\
+</paper-input>\n\
+\n\
+<xsystems-youtube-videos  key="AIzaSyDTj9__sWn_MKroJ6vlad1pCCidRBi6a5g"\n\
+                          query="[[query]]"\n\
+                          channel="UCnUYZLuoy1rq1aVMwx4aTzw"\n\
+                          selected="{{video}}">\n\
+</xsystems-youtube-videos>\n\
+\n\
+<demo-overlay id="videoOverlay"\n\
+                  on-iron-overlay-closed="_deselectVideo">\n\
+  <paper-card id="videoPlayerCard"\n\
+              elevation="5">\n\
+    <google-youtube id="videoPlayer"\n\
+                    video-id="[[video.id.videoId]]"\n\
+                    width="100%"\n\
+                    height="100%"\n\
+                    rel="0"\n\
+                    showinfo="0"\n\
+                    iv_load_policy="3"\n\
+                    modestbranding="1">\n\
+    </google-youtube>\n\
+  </paper-card>\n\
+</demo-overlay>\
+```'
+              }
+            },
+
+            observers: [
+              '_handleVideo(video)'
+            ],
+
+            _handleVideo: function(video) {
+              if (video != null) {
+                this.$.videoOverlay.open();
+              } else {
+                this.$.videoOverlay.close();
+              }
+            },
+
+            _deselectVideo: function(event) {
+              this.$.videoPlayer.pause();
+              this.video = null;
+            }
+          });
+        });
+      </script>
+    </dom-module>
+
+    <xsystems-youtube-demo></xsystems-youtube-demo>
+  </body>
+</html>

@@ -1,0 +1,193 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../paper-card/paper-card.html">
+
+<link rel="import" href="xsystems-flickr-photoset.html">
+<link rel="import" href="xsystems-flickr-photo.html">
+
+<!--
+`xsystems-flickr-photoset-view`
+Element to obtain photoset data from the Flickr API and to present this data.
+
+@demo demo/index.html
+-->
+
+<dom-module id="xsystems-flickr-photoset-view">
+  <template>
+    <style>
+      :host {
+        @apply(--layout-vertical);
+        @apply(--layout-flex);
+        padding-bottom: 1%;
+      }
+
+      iron-scroll-threshold {
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        @apply(--layout-wrap);
+        padding: 1%;
+      }
+
+      .photoset {
+        margin-top: 1%;
+      }
+
+      :host:not([narrow]) .photoset {
+        width: 32.66%;
+      }
+
+      :host[narrow] .photoset {
+        width: 100%;
+      }
+
+      .photoset-title {
+        margin-top: 0;
+      }
+
+      .photoset-thumbnail {
+        width: 100%;
+        padding-bottom: 55%;
+      }
+
+      xsystems-flickr-photoset, xsystems-flickr-photo, array-selector {
+        display: none;
+      }
+    </style>
+
+    <xsystems-flickr-photoset   key="[[key]]"
+                                user-id="[[userId]]"
+                                photoset-id="[[photosetId]]"
+                                per-page="9"
+                                page="{{_page}}"
+                                pages="{{_pages}}"
+                                media="photos"
+                                debounce-duration="[[debounceDuration]]"
+                                items="{{_items}}">
+    </xsystems-flickr-photoset>
+
+    <iron-scroll-threshold  id="scrollThreshold"
+                            on-lower-threshold="_loadMorePhotosets">
+      <template is="dom-repeat" items="[[_photos]]" as="photo">
+        <xsystems-flickr-photo  key="[[key]]"
+                                photo-id="[[photo.id]]"
+                                size="Small 320"
+                                url="{{photo.url}}"
+                                title="{{photo.title}}"
+                                description="{{photo.description}}">
+        </xsystems-flickr-photo>
+
+        <paper-card class="photoset">
+          <iron-image class="photoset-thumbnail"
+                      on-tap="_selectPhoto"
+                      sizing="cover"
+                      src="[[photo.url]]"></iron-image>
+          <div class="card-content">
+            <h2 class="photoset-title">[[photo.title]]</h2>
+            [[photo.description]]
+          </div>
+        </paper-card>
+      </template>
+
+      <div id="filler"></div>
+    </iron-scroll-threshold>
+
+    <array-selector id="photoSelector" items="{{_photos}}" selected="{{selected}}"></array-selector>
+
+  </template>
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'xsystems-flickr-photoset-view',
+
+        properties: {
+          /**
+           * Flickr API key.
+           */
+          key: String,
+
+          /**
+          * Id of the photoset for which to get the photos.
+          */
+          photosetId: String,
+
+          /**
+           * Id of the user that owns the photo set corresponding to `photosetId`.
+           *
+           * This is optional, but passing this gives better performance.
+           */
+          userId: String,
+
+          /**
+           * Length of time in milliseconds to debounce multiple automatically generated requests.
+           */
+          debounceDuration: {
+            type: Number,
+            value: 500
+          },
+
+          /**
+           * Use a layout that accommodates narrow devices.
+           */
+          narrow: Boolean,
+
+          /**
+           * Selected photo.
+           */
+          selected: {
+            type: Object,
+            notify: true
+          },
+
+          _page: Number,
+
+          _pages: Number,
+
+          _photos: Array,
+
+          _items: Array
+        },
+
+        observers: [
+          '_handleSearchResult(_items)'
+        ],
+
+        _loadMorePhotosets: function(e) {
+          if (this._page < this._pages) {
+            this._page += 1;
+          } else {
+            this.$.scrollThreshold.clearTriggers();
+          }
+        },
+
+        _handleSearchResult: function(items) {
+          if (this._page != 1) {
+            for (var i = 0; i < items.length; i++) {
+              this.push('_photos', items[i]);
+            }
+          } else {
+            this._photos = items;
+          }
+
+          var numberOfItemsToFillRow = 3 - (this._photos.length % 3);
+          if (numberOfItemsToFillRow < 3) {
+            this.$.filler.style.width = numberOfItemsToFillRow * 32.66 + '%';
+            this.$.filler.style.display = '';
+          } else {
+            this.$.filler.style.display = 'none';
+          }
+          this.updateStyles();
+
+          this.$.scrollThreshold.clearTriggers();
+        },
+
+        _selectPhoto: function(event) {
+          var photo = event.model.photo;
+          this.$.photoSelector.select(photo);
+        }
+      });
+    })();
+  </script>
+</dom-module>

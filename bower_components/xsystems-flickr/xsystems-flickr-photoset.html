@@ -1,0 +1,218 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<!--
+`xsystems-flickr-photoset`
+Element to obtain photoset data from the Flickr API.
+
+@demo demo/index.html
+-->
+
+<dom-module id="xsystems-flickr-photoset">
+  <template>
+    <iron-ajax  id="photosetAjax"
+                url="https://api.flickr.com/services/rest/"
+                debounce-duration="[[debounceDuration]]"
+                last-response="{{_response}}">
+    </iron-ajax>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'xsystems-flickr-photoset',
+
+        properties: {
+          /**
+           * Flickr API key.
+           */
+          key: String,
+
+          /**
+          * Id of the photoset for which to get the photos.
+          */
+          photosetId: String,
+
+          /**
+           * Id of the user that owns the photo set corresponding to `photosetId`.
+           *
+           * This is optional, but passing this gives better performance.
+           */
+          userId: String,
+
+          /**
+           * The page of results to return.
+           */
+          page: {
+            type: Number,
+            value: 1,
+            notify: true
+          },
+
+          /**
+           * Number of photos to return per page.
+           */
+          perPage: {
+            type: Number,
+            value: 5
+          },
+
+          /**
+           * Extra information to fetch for each returned record.
+           *
+           * See the <a href="https://www.flickr.com/services/api/flickr.photosets.getPhotos.html">Flickr API documentation</a> for the supported fields.
+           */
+          extras: Array,
+
+          /**
+           * Return photos only matching a certain privacy level.
+           *
+           * This only applies when making an authenticated call to view a photoset you own.
+           * See the <a href="https://www.flickr.com/services/api/flickr.photosets.getPhotos.html">Flickr API documentation</a> for the supported values.
+           */
+          privacyFilter: Number,
+
+          /**
+           * Filter results by media type.
+           *
+           * Possible values are `all`, `photos` or `videos`.
+           */
+          media: {
+            type: String,
+            value: 'all'
+          },
+
+          /**
+           * Length of time in milliseconds to debounce multiple automatically generated requests.
+           */
+          debounceDuration: Number,
+
+          /**
+           * Number of available pages.
+           */
+          pages: {
+            type: Number,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Number of photos on the requested page.
+           */
+          resultsTotal: {
+            type: Number,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Items returned by the Flickr API.
+           */
+          items: {
+            type: Array,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Id of the primary photo of the photo set.
+           */
+          primary: {
+            type: String,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Id of the user that owns the photo set.
+           */
+          owner: {
+            type: String,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Name of the user that owns the photo set.
+           */
+          ownerName: {
+            type: String,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Title of the returned photo set.
+           */
+          title: {
+            type: String,
+            readOnly: true,
+            notify: true
+          },
+
+          _response: Object
+        },
+
+        observers: [
+          '_computeRequestParams(key, userId, photosetId)',
+          '_processResponse(_response)',
+          '_fetchPage(page)'
+        ],
+
+        _computeRequestParams: function(key, userId, photosetId) {
+          var requestParams = {};
+          requestParams.format = 'json';
+          requestParams.nojsoncallback = 1;
+          requestParams.method = 'flickr.photosets.getPhotos';
+          requestParams.api_key = key;
+          requestParams.user_id = userId;
+          requestParams.photoset_id = photosetId;
+
+          if (this.page != null) {
+            requestParams.page = this.page;
+          }
+
+          if (this.perPage != null) {
+            requestParams.per_page = this.perPage;
+          }
+
+          if (this.extras != null && this.extras.length > 0) {
+            requestParams.extras = this.extras.join();
+          }
+
+          if (this.privacyFilter != null) {
+            requestParams.privacy_filter = this.privacyFilter;
+          }
+
+          if (this.media != null) {
+            requestParams.media = this.media;
+          }
+
+          this.$.photosetAjax.params = requestParams;
+          this.$.photosetAjax.generateRequest();
+        },
+
+        _processResponse: function() {
+          if (this._response.stat != "ok") {
+            return;
+          }
+
+          var photoset = this._response.photoset;
+
+          this._setPages(photoset.pages);
+          this._setResultsTotal(photoset.total);
+          this._setItems(photoset.photo);
+
+          this._setPrimary(photoset.primary);
+          this._setOwner(photoset.owner);
+          this._setOwnerName(photoset.ownername);
+          this._setTitle(photoset.title);
+        },
+
+        _fetchPage: function() {
+          this._computeRequestParams(this.key, this.userId, this.photosetId);
+        }
+      });
+    })();
+  </script>
+</dom-module>

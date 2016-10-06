@@ -1,0 +1,87 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/effects/waterfall.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/xsystems-elements/xsystems-elements.html">
+
+<dom-module id="xsystems-elements-app">
+  <template>
+    <style>
+      app-header {
+        background-color: black;
+        color: white;
+      }
+
+      div[main-title] {
+        @apply(--paper-font-headline);
+        position: absolute;;
+        left: 10%;
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route  route="{{route}}"
+                pattern="/:element"
+                data="{{routeData}}"
+                tail="{{routeTail}}">
+    </app-route>
+
+    <app-header-layout fullbleed has-scrolling-region>
+      <app-header fixed effects="waterfall">
+        <app-toolbar>
+          <paper-icon-button  icon="arrow-back"
+                              on-tap="_deselectElement"
+                              hidden="[[!routeData.element]]">
+          </paper-icon-button>
+          <div main-title>[[_calculateTitle(elements, routeData.element)]]</div>
+        </app-toolbar>
+      </app-header>
+      <xsystems-element-catalog elements="[[elements]]"
+                                selected="{{routeData.element}}"
+                                base="[[base]]">
+      </xsystems-element-catalog>
+    </app-header-layout>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'xsystems-elements-app',
+
+      properties: {
+        elements: {
+          type: Array,
+          value: [
+            'xsystems-calendar',
+            'xsystems-flickr',
+            'xsystems-weather',
+            'xsystems-youtube',
+            'xsystems-bower',
+            'xsystems-element-catalog'
+          ]
+        },
+        base: {
+          type: String,
+          value: function() {
+            return location.protocol + "//" + location.host + '/bower_components/';
+          }
+        }
+      },
+
+      _calculateTitle: function(elements, element) {
+        return elements.indexOf(element) > -1 ? '<' + element + '>' : 'Elements';
+      },
+
+      _deselectElement: function() {
+        this.set('routeData.element', null);
+      }
+    });
+  </script>
+</dom-module>

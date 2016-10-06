@@ -1,0 +1,115 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+
+<!--
+`xsystems-calendar-google`
+Element wrapping embeddable Google Calendar code.
+
+@demo demo/index.html
+-->
+
+<dom-module id="xsystems-calendar-google">
+  <template>
+    <style>
+      :host {
+        @apply(--layout-vertical);
+        @apply(--layout-flex);
+      }
+
+      #calendar {
+        @apply(--layout-flex);
+        border: none;
+      }
+    </style>
+
+    <iframe id="calendar" xmlns="https://www.w3.org/1999/xhtml"></iframe>
+
+  </template>
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'xsystems-calendar-google',
+
+        properties: {
+          /**
+           * Show the calendar in `agenda` mode.
+           */
+          narrow: Boolean,
+
+          /**
+           * Set of calendars to show.
+           */
+          calendars: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+
+          /**
+           * Time zone, in IANA time zone notation.
+           *
+           * For example, `Europe/Amsterdam`.
+           */
+          timeZone: String,
+
+          /**
+           * Country code, as an ISO 3166-1 alpha-2 code.
+           *
+           * For example, `NL` for The Netherlands.
+           */
+          language: String,
+
+          /**
+           * Background color, as web color without the `#` character.
+           *
+           * For example, `000080` for navy blue.
+           */
+          backgroundColor: String
+        },
+
+        observers: [
+          'refresh(narrow)',
+          'refresh(calendars)',
+          'refresh(timeZone)',
+          'refresh(language)',
+          'refresh(backgroundColor)'
+        ],
+
+        /**
+         * Refresh the calendar using the current property values.
+         */
+        refresh: function() {
+          if (this.calendars.length <= 0) {
+            return;
+          }
+
+          var calendarUrl = 'https://calendar.google.com/calendar/embed?showTitle=0&wkst=2';
+
+          if (this.narrow) {
+            calendarUrl += '&mode=AGENDA&showNav=0&showPrint=0';
+          }
+
+          if (this.timeZone) {
+            calendarUrl += '&ctz=' + encodeURIComponent(this.timeZone);
+          }
+
+          if (this.language) {
+            calendarUrl += '&hl=' + this.language;
+          }
+
+          if (this.backgroundColor) {
+            calendarUrl += '&bgcolor=%23' + this.backgroundColor;
+          }
+
+          for (var i = 0; i < this.calendars.length; i++) {
+            calendarUrl += '&src=' + encodeURIComponent(this.calendars[i]);
+          }
+
+          this.$.calendar.src = calendarUrl;
+        }
+      });
+    })();
+  </script>
+</dom-module>

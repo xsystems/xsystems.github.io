@@ -1,0 +1,129 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-component-page/iron-component-page.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../neon-animation/neon-animated-pages.html">
+<link rel="import" href="../neon-animation/neon-animatable.html">
+<link rel="import" href="../neon-animation/animations/slide-from-left-animation.html">
+<link rel="import" href="../neon-animation/animations/slide-right-animation.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-item/paper-item-body.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../xsystems-bower/xsystems-bower.html">
+
+<!--
+`xsystems-element-catalog`
+Catalog to browse a collection of elements
+
+@demo demo/index.html
+-->
+
+<dom-module id="xsystems-element-catalog">
+  <template>
+    <style>
+      :host {
+        @apply(--layout-vertical);
+        @apply(--layout-flex);
+      }
+
+      neon-animated-pages {
+        @apply(--layout-flex);
+      }
+    </style>
+
+    <xsystems-bower packages="[[elements]]"
+                    packages-json="{{_packagesJson}}"
+                    base="[[base]]">
+    </xsystems-bower>
+
+    <neon-animated-pages  selected="[[_selectPage(elements, selected)]]"
+                          attr-for-selected="data-page"
+                          fallback-selection="elements"
+                          entry-animation="slide-from-left-animation"
+                          exit-animation="slide-right-animation">
+      <neon-animatable data-page="elements">
+        <paper-listbox attr-for-selected="data-element" selected="{{selected}}">
+          <template is="dom-repeat" items="[[_packagesJson]]" as="packageJson">
+            <paper-item data-element="[[packageJson.name]]">
+              <paper-item-body two-line>
+                <div>[[packageJson.name]]</div>
+                <div secondary>[[packageJson.description]]</div>
+              </paper-item-body>
+              <paper-icon-button  icon="code"
+                                  on-tap="_openHomepage"
+                                  hidden$="[[!packageJson.homepage]]"
+                                  alt="Source"
+                                  title="Source">
+              </paper-icon-button>
+            </paper-item>
+          </template>
+        </paper-listbox>
+      </neon-animatable>
+      <neon-animatable data-page="element">
+        <iron-component-page id="elementPage" src="../xsystems-element-catalog"></iron-component-page>
+      </neon-animatable>
+    </neon-animated-pages>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'xsystems-element-catalog',
+
+      properties: {
+        /**
+         * Bower package names of the elements that are to be part of the catalog.
+         */
+        elements: Array,
+
+        /**
+         * Bower package name of the selected element.
+         */
+        selected: {
+          type: String,
+          value: null,
+          notify: true
+        },
+
+        /**
+         * The relative root for determining paths to demos and default source detection.
+         */
+        base: String,
+
+        _packagesJson: Array
+      },
+
+      observers: [
+        '_calculateElementUrl(elements, selected)'
+      ],
+
+      _selectPage: function(elements, element) {
+        return elements.indexOf(element) > -1 ? 'element' : 'elements';
+      },
+
+      _calculateElementUrl: function(elements, element) {
+        if (elements.indexOf(element) > -1) {
+
+          var elementMain = element + '.html';
+          for (var i = 0; i < this._packagesJson.length; i++) {
+            var packageJson = this._packagesJson[i];
+            if (packageJson.name == element
+              && packageJson.main != null
+              && packageJson.main.match('\.html$')) {
+              elementMain = packageJson.main;
+            }
+          }
+
+          this.$.elementPage.base = this.base + element + '/';
+          this.$.elementPage.src = elementMain;
+        }
+      },
+
+      _openHomepage: function(event) {
+        event.stopPropagation();
+        window.open(event.model.packageJson.homepage);
+      }
+    });
+  </script>
+</dom-module>

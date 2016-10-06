@@ -1,0 +1,65 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<!--
+`xsystems-bower`
+Element to obtain Bower package information
+
+@demo demo/index.html
+-->
+
+<dom-module id="xsystems-bower">
+  <template>
+    <iron-ajax  id="packagesAjax"
+                handle-as="json"
+                on-response="_handleResponse">
+    </iron-ajax>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'xsystems-bower',
+
+      properties: {
+        /**
+         * Package names of the packages for which to obtain Bower package information.
+         */
+        packages: Array,
+
+        /**
+         * Bower package information of the packages for which the names where provided.
+         */
+        packagesJson: {
+          type: Array,
+          notify: true,
+          readOnly: true
+        },
+
+        /**
+         * Path to Bower packages.
+         */
+        base: {
+          type: String,
+          value: '../'
+        }
+      },
+
+      observers: [
+        '_handlePackages(packages)'
+      ],
+
+      _handlePackages: function(packages) {
+        this._setPackagesJson([]);
+        for (var i = 0; i < packages.length; i++) {
+          this.$.packagesAjax.url = this.base + packages[i] + '/bower.json';
+          this.$.packagesAjax.generateRequest();
+        }
+      },
+
+      _handleResponse: function(event) {
+        this.push('packagesJson', event.detail.response);
+      }
+    });
+  </script>
+</dom-module>

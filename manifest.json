@@ -1,0 +1,7 @@
+{
+  "name": "xSystems Elements",
+  "short_name": "xsystems-elements-app",
+  "description": "Catalog of elements created by xSystems",
+  "start_url": "/",
+  "display": "standalone"
+}

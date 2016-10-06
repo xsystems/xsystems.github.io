@@ -1,0 +1,31 @@
+{
+  "name": "xsystems-bower",
+  "authors": [
+    "Koen Boes <koenboes@xsystems.org>"
+  ],
+  "description": "Element to obtain Bower package information",
+  "homepage": "https://github.com/xsystems/xsystems-bower",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/xsystems/xsystems-bower.git"
+  },
+  "main": "xsystems-bower.html",
+  "keywords": [
+    "Bower",
+    "package"
+  ],
+  "license": "GPL-3.0",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.4.3"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "paper-material": "PolymerElements/paper-material#^1.0.6",
+    "marked-element": "PolymerElements/marked-element#^1.2.0",
+    "paper-styles": "PolymerElements/paper-styles#^1.1.5",
+    "prism-element": "PolymerElements/prism-highlighter#^1.1.1"
+  }
+}

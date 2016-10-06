@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+  <head>
+    <title>xsystems-flickr demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-icons/iron-icons.html">
+    <link rel="import" href="../../iron-image/iron-image.html">
+    <link rel="import" href="../../iron-scroll-threshold/iron-scroll-threshold.html">
+    <link rel="import" href="../../marked-element/marked-element.html">
+    <link rel="import" href="../../neon-animation/neon-animated-pages.html">
+    <link rel="import" href="../../neon-animation/neon-animatable.html">
+    <link rel="import" href="../../paper-card/paper-card.html">
+    <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="../../paper-styles/color.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../prism-element/prism-highlighter.html">
+    <link rel="import" href="../../prism-element/prism-theme-default.html">
+
+    <link rel="import" href="../xsystems-flickr-photo.html">
+    <link rel="import" href="../xsystems-flickr-photoset.html">
+    <link rel="import" href="../xsystems-flickr-photosets.html">
+    <link rel="import" href="../xsystems-flickr-photoset-view.html">
+    <link rel="import" href="../xsystems-flickr-photosets-view.html">
+
+    <link rel="import" href="demo-overlay.html">
+  </head>
+  <body>
+    <dom-module id="xsystems-flickr-demo">
+      <template>
+        <style>
+          :host {
+            @apply(--layout-vertical);
+            padding-left: 20%;
+            padding-right: 20%;
+            font-family: 'Roboto', 'Noto', sans-serif;
+            font-size: 14px;
+          }
+
+          paper-material {
+            @apply(--layout-vertical);
+            background-color: white;
+            margin-bottom: 1%;
+          }
+
+          .demo {
+            padding: 1%;
+          }
+
+          marked-element {
+            @apply(--layout-vertical);
+          }
+
+          .markdown-html {
+            padding-left: 5%;
+            background-color: var(--google-grey-100);
+            overflow: auto;
+          }
+
+          .vertical-section-container {
+            margin-left: auto;
+            margin-right: auto;
+            width: 80%;
+          }
+
+          neon-animated-pages {
+            height: 600px;
+          }
+
+          neon-animatable {
+            @apply(--layout-vertical);
+          }
+
+          #photoCard {
+            padding: 1%;
+            width: 854px;
+            height: 480px;
+          }
+
+          #photoCard > a {
+            width: 100%;
+            height: 100%;
+          }
+
+          #photo {
+            width: 100%;
+            height: 100%;
+          }
+
+          .menu {
+            height: 40px;
+            @apply(--layout-horizontal);
+            @apply(--layout-center);
+          }
+        </style>
+
+        <prism-highlighter></prism-highlighter>
+
+        <h3>Basic xsystems-flickr Demo</h3>
+        <paper-material elevation="1">
+          <div class="demo">
+            <neon-animated-pages  selected="[[selectedPage]]"
+                                  attr-for-selected="data-page"
+                                  fallback-selection="photosets">
+              <neon-animatable data-page="photosets">
+                <div class="menu">
+                </div>
+
+                <xsystems-flickr-photosets-view key="757b4474c3d5653a8958a33d9cf647a2"
+                                                user-id="143394479@N04"
+                                                selected="{{photoset}}">
+                </xsystems-flickr-photosets-view>
+
+              </neon-animatable>
+              <neon-animatable data-page="photos">
+                <div class="menu">
+                  <paper-icon-button icon="arrow-back" title="Back to albums" on-tap="_showAlbums"></paper-icon-button>
+                </div>
+
+                <xsystems-flickr-photoset-view  key="757b4474c3d5653a8958a33d9cf647a2"
+                                                user-id="143394479@N04"
+                                                photoset-id="[[photoset.id]]"
+                                                selected="{{photo}}">
+                </xsystems-flickr-photoset-view>
+
+                <xsystems-flickr-photo  key="757b4474c3d5653a8958a33d9cf647a2"
+                                        photo-id="[[photo.id]]"
+                                        url="{{url}}">
+                </xsystems-flickr-photo>
+
+                <demo-overlay id="photoOverlay"
+                                  on-iron-overlay-closed="_deselectPhoto">
+                  <paper-card id="photoCard"
+                              elevation="5">
+                    <a href="[[url]]" download>
+                      <iron-image id="photo"
+                                  preload
+                                  fade
+                                  sizing="cover"
+                                  src="[[url]]">
+                      </iron-image>
+                    </a>
+                  </paper-card>
+                </demo-overlay>
+
+              </neon-animatable>
+            </neon-animated-pages>
+          </div>
+
+          <marked-element markdown="[[demo]]">
+            <div class="markdown-html"></div>
+          </marked-element>
+        </paper-material>
+      </template>
+      <script>
+        HTMLImports.whenReady(function () {
+          Polymer({
+            is: 'xsystems-flickr-demo',
+
+            properties: {
+              selectedPage: String,
+              demo: {
+                type: String,
+                value: '```html\n\
+<neon-animated-pages  selected="[[selectedPage]]"\n\
+                      attr-for-selected="data-page"\n\
+                      fallback-selection="photosets">\n\
+  <neon-animatable data-page="photosets">\n\
+    <div class="menu">\n\
+    </div>\n\
+\n\
+    <xsystems-flickr-photosets-view key="ABCDEFGH0123456789"\n\
+                                    user-id="143394479@N04"\n\
+                                    selected="{{photoset}}">\n\
+    </xsystems-flickr-photosets-view>\n\
+\n\
+  </neon-animatable>\n\
+  <neon-animatable data-page="photos">\n\
+    <div class="menu">\n\
+      <paper-icon-button icon="arrow-back" title="Back to albums" on-tap="_showAlbums"></paper-icon-button>\n\
+    </div>\n\
+\n\
+    <xsystems-flickr-photoset-view  key="ABCDEFGH0123456789"\n\
+                                    user-id="143394479@N04"\n\
+                                    photoset-id="[[photoset.id]]"\n\
+                                    selected="{{photo}}">\n\
+    </xsystems-flickr-photoset-view>\n\
+\n\
+    <xsystems-flickr-photo  key="ABCDEFGH0123456789"\n\
+                            photo-id="[[photo.id]]"\n\
+                            url="{{url}}">\n\
+    </xsystems-flickr-photo>\n\
+\n\
+    <demo-overlay id="photoOverlay"\n\
+                      on-iron-overlay-closed="_deselectPhoto">\n\
+      <paper-card id="photoCard"\n\
+                  elevation="5">\n\
+        <a href="[[url]]" download>\n\
+          <iron-image id="photo"\n\
+                      preload\n\
+                      fade\n\
+                      sizing="cover"\n\
+                      src="[[url]]">\n\
+          </iron-image>\n\
+        </a>\n\
+      </paper-card>\n\
+    </demo-overlay>\n\
+\n\
+  </neon-animatable>\n\
+</neon-animated-pages>\
+```'
+              }
+            },
+
+            observers: [
+              '_handlePhotoset(photoset)',
+              '_handlePhoto(photo)'
+            ],
+
+            _handlePhotoset: function(photoset){
+              if (photoset) {
+                this.selectedPage = 'photos';
+              } else {
+                this.selectedPage = 'photosets';
+                this.photoset = null;
+              }
+            },
+
+            _handlePhoto: function(photo) {
+              if (photo) {
+                this.$.photoOverlay.close();
+                this.$.photoOverlay.open();
+              } else {
+                this.$.photoOverlay.close();
+              }
+            },
+
+            _deselectPhoto: function(event) {
+              this.photo = null;
+            },
+
+            _showAlbums: function() {
+              this.photoset = null;
+              this.selectedPage = 'photosets';
+            }
+          });
+        });
+      </script>
+    </dom-module>
+
+    <xsystems-flickr-demo></xsystems-flickr-demo>
+  </body>
+</html>

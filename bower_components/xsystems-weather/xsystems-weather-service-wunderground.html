@@ -1,0 +1,121 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<!--
+`xsystems-weather-service-wunderground`
+Obtains weather data from the Wundergraound weather service.
+
+@demo demo/index.html
+-->
+
+<dom-module id="xsystems-weather-service-wunderground">
+  <template>
+    <iron-ajax  id="wundergroundAjax"
+                url="[[_computeUrl(key, query)]]"
+                params="[[params]]"
+                last-response="{{_response}}">
+    </iron-ajax>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'xsystems-weather-service-wunderground',
+
+        properties: {
+          /**
+           * Wunderground API key.
+           */
+          key: String,
+
+          /**
+           * Location for which you want weather information.
+           *
+           * See, the <a href="https://www.wunderground.com/weather/api/d/docs?d=data/index#standard_request_url_format">Wunderground API</a> for examples.
+           */
+          query: {
+            type: String,
+            value: "Netherlands/The_Hague"
+          },
+
+          /**
+           * Query parameters the <a href="https://www.wunderground.com/weather/api/d/docs?d=data/index">Wunderground API</a> allows.
+           */
+          params: Object,
+
+          /**
+           * Update interval, in seconds.
+           */
+          interval: {
+            type: Number,
+            value: 600
+          },
+
+          /**
+           * Specify temperature data in degrees Fahrenheit.
+           */
+          fahrenheit: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * Weather data.
+           */
+          data: {
+            type: Object,
+            readOnly: true,
+            notify: true
+          },
+
+          _response: Object
+        },
+
+        observers: [
+          '_processResponse(_response)'
+        ],
+
+        attached: function() {
+          this.$.wundergroundAjax.generateRequest();
+          window.setInterval(function() {
+            this.$.wundergroundAjax.generateRequest();
+          }.bind(this), this.interval * 1000);
+        },
+
+        _computeUrl: function(key, query) {
+          return "https://api.wunderground.com/api/" + key + "/geolookup/forecast/q/" + query + ".json";
+        },
+
+        _processResponse: function(response) {
+          var locationResponse = response.location;
+          var location = {};
+          location.country = locationResponse.country;
+          location.city = locationResponse.city;
+
+          var forecastdays = response.forecast.simpleforecast.forecastday;
+          var forecast = [];
+          for (var i = 0; i < forecastdays.length; i++) {
+            var forecastday = forecastdays[i];
+
+            var day = {};
+            day.weekday = forecastday.date.weekday;
+            day.weekdayShort = forecastday.date.weekday_short;
+            day.iconUrl = forecastday.icon_url.replace(/^http:\/\//i, 'https://');
+            day.conditions = forecastday.conditions;
+            day.temperature = {};
+            day.temperature.high = this.fahrenheit ? forecastday.high.fahrenheit : forecastday.high.celsius;
+            day.temperature.low = this.fahrenheit ? forecastday.low.fahrenheit : forecastday.low.celsius;
+
+            forecast.push(day);
+          }
+
+          var data = {};
+          data.location = location;
+          data.forecast = forecast;
+
+          this._setData(data);
+        }
+      });
+    })();
+  </script>
+</dom-module>

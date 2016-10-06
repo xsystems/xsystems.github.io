@@ -1,0 +1,40 @@
+{
+  "name": "xsystems-elements",
+  "authors": [
+    "Koen Boes <koenboes@xsystems.org>"
+  ],
+  "description": "Collection of elements created and maintained by xSystems",
+  "homepage": "https://github.com/xsystems/xsystems-elements",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/xsystems/xsystems-elements.git"
+  },
+  "main": "xsystems-elements.html",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "xsystems",
+    "elements",
+    "element-collection"
+  ],
+  "license": "GPL-3.0",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "xsystems-calendar": "xsystems/xsystems-calendar#^0.1.0",
+    "xsystems-flickr": "xsystems/xsystems-flickr#^0.1.0",
+    "xsystems-weather": "xsystems/xsystems-weather#^0.2.0",
+    "xsystems-youtube": "xsystems/xsystems-youtube#^0.1.0",
+    "xsystems-bower": "xsystems/xsystems-bower#^0.2.0",
+    "xsystems-element-catalog": "xsystems/xsystems-element-catalog#^0.4.0"
+  },
+  "version": "0.5.0",
+  "_release": "0.5.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.5.0",
+    "commit": "9bbcf9bff8e5450c03ca655fd394ec29f317231f"
+  },
+  "_source": "git://github.com/xsystems/xsystems-elements.git",
+  "_target": "^0.5.0",
+  "_originalSource": "xsystems/xsystems-elements"
+}

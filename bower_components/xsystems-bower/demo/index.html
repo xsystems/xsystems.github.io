@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+  <head>
+    <title>xsystems-bower demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../polymer/polymer.html">
+
+    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../paper-material/paper-material.html">
+    <link rel="import" href="../../paper-styles/color.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../marked-element/marked-element.html">
+    <link rel="import" href="../../prism-element/prism-highlighter.html">
+    <link rel="import" href="../../prism-element/prism-theme-default.html">
+
+    <link rel="import" href="../xsystems-bower.html">
+  </head>
+  <body>
+    <dom-module id="xsystems-bower-demo">
+      <template>
+        <style>
+          :host {
+            @apply(--layout-vertical);
+            padding-left: 20%;
+            padding-right: 20%;
+            font-family: 'Roboto', 'Noto', sans-serif;
+            font-size: 14px;
+          }
+
+          paper-material {
+            @apply(--layout-vertical);
+            background-color: white;
+            margin-bottom: 1%;
+          }
+
+          marked-element {
+            @apply(--layout-vertical);
+          }
+
+          .markdown-html {
+            padding-left: 5%;
+            background-color: var(--google-grey-100);
+            overflow: auto;
+          }
+
+          .package {
+            padding: 1%;
+          }
+
+          .package:nth-child(odd) {
+            background-color: var(--google-grey-100);
+          }
+        </style>
+
+        <prism-highlighter></prism-highlighter>
+
+        <h3>Basic xsystems-bower Demo</h3>
+        <paper-material elevation="1">
+          <div class="demo">
+            <xsystems-bower packages="[[packages]]"
+                            packages-json="{{packagesJson}}"
+                            base="../../">
+            </xsystems-bower>
+            <template is="dom-repeat" items="[[packagesJson]]" as="packageJson">
+              <div class="package">
+                <h4>[[packageJson.name]]</h4>
+                <span>[[packageJson.description]]</span>
+                <h5>Repository</h5>
+                <pre>[[_jsonObjectToString(packageJson.repository)]]</pre>
+                <h5>Dependencies</h5>
+                <pre>[[_jsonObjectToString(packageJson.dependencies)]]</pre>
+              </div>
+            </template>
+          </div>
+
+          <marked-element markdown="[[demo]]">
+            <div class="markdown-html"></div>
+          </marked-element>
+        </paper-material>
+      </template>
+      <script>
+        HTMLImports.whenReady(function () {
+          Polymer({
+            is: 'xsystems-bower-demo',
+
+            properties: {
+              packages: {
+                type: Array,
+                value: function() {
+                  return ['marked-element', 'prism-element', 'xsystems-bower'];
+                }
+              },
+              demo: {
+                type: String,
+                value: '```html\n\
+<xsystems-bower packages="[[packages]]"\n\
+                packages-json="{{packagesJson}}">\n\
+</xsystems-bower>\n\
+<template is="dom-repeat" items="[[packagesJson]]" as="packageJson">\n\
+  <div class="package">\n\
+    <h4>[[packageJson.name]]</h4>\n\
+    <span>[[packageJson.description]]</span>\n\
+    <h5>Repository</h5>\n\
+    <pre>[[_jsonObjectToString(packageJson.repository)]]</pre>\n\
+    <h5>Dependencies</h5>\n\
+    <pre>[[_jsonObjectToString(packageJson.dependencies)]]</pre>\n\
+  </div>\n\
+</template>\
+```'
+              }
+            },
+
+            _jsonObjectToString: function(object) {
+              return JSON.stringify(object, null, '  ');
+            }
+          });
+        });
+      </script>
+    </dom-module>
+
+    <xsystems-bower-demo></xsystems-bower-demo>
+  </body>
+</html>

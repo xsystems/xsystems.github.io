@@ -1,0 +1,139 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<!--
+`xsystems-flickr-photosets`
+Element to obtain a list of photosets from the Flickr API.
+
+@demo demo/index.html
+-->
+
+<dom-module id="xsystems-flickr-photosets">
+  <template>
+    <iron-ajax  id="photosetsAjax"
+                url="https://api.flickr.com/services/rest/"
+                debounce-duration="[[debounceDuration]]"
+                last-response="{{_response}}">
+    </iron-ajax>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'xsystems-flickr-photosets',
+
+        properties: {
+          /**
+           * Flickr API key.
+           */
+          key: String,
+
+          /**
+           * Id of the user to get a photoset list for.
+           */
+          userId: String,
+
+          /**
+           * The page of results to return.
+           */
+          page: {
+            type: Number,
+            value: 1,
+            notify: true
+          },
+
+          /**
+           * Number of photos to return per page.
+           */
+          perPage: {
+            type: Number,
+            value: 5
+          },
+
+          /**
+           * Extra information to fetch for the primary photo.
+           *
+           * See the <a href="https://www.flickr.com/services/api/flickr.photosets.getList.html">Flickr API documentation</a> for the supported fields.
+           */
+          primaryPhotoExtras: Array,
+
+          /**
+           * Length of time in milliseconds to debounce multiple automatically generated requests.
+           */
+          debounceDuration: Number,
+
+          /**
+           * Number of available pages.
+           */
+          pages: {
+            type: Number,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Number of photosets on the requested page.
+           */
+          resultsTotal: {
+            type: Number,
+            readOnly: true,
+            notify: true
+          },
+
+          /**
+           * Items returned by the Flickr API.
+           */
+          items: {
+            type: Array,
+            readOnly: true,
+            notify: true
+          },
+
+          _response: Object
+        },
+
+        observers: [
+          '_computeRequestParams(key, userId)',
+          '_processResponse(_response)',
+          '_fetchPage(page)'
+        ],
+
+        _computeRequestParams: function(key, userId) {
+          var requestParams = {};
+          requestParams.format = 'json';
+          requestParams.nojsoncallback = 1;
+          requestParams.method = 'flickr.photosets.getList';
+          requestParams.api_key = key;
+          requestParams.user_id = userId;
+
+          if (this.page != null) {
+            requestParams.page = this.page;
+          }
+
+          if (this.perPage != null) {
+            requestParams.per_page = this.perPage;
+          }
+
+          if (this.primaryPhotoExtras != null && this.primaryPhotoExtras.length > 0) {
+            requestParams.primary_photo_extras = this.primaryPhotoExtras.join();
+          }
+
+          this.$.photosetsAjax.params = requestParams;
+          this.$.photosetsAjax.generateRequest();
+        },
+
+        _processResponse: function() {
+          var photosets = this._response.photosets;
+
+          this._setPages(photosets.pages);
+          this._setResultsTotal(photosets.total);
+          this._setItems(photosets.photoset);
+        },
+
+        _fetchPage: function() {
+          this._computeRequestParams(this.key, this.userId);
+        }
+      });
+    })();
+  </script>
+</dom-module>
